@@ -37,7 +37,7 @@
         "westus2SubnetPrefix": "10.2.0.0/24",
         "westus2VMNicResourceId": "[resourceId('Microsoft.Network/networkInterfaces', variables('westus2VMNicName'))]",
         "westus2VMNicPIPResourceId": "[resourceId('Microsoft.Network/publicIPAddresses', variables('westus2VMNicPIPName'))]",
-        "westus2SubnetResourceId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('westus2VnetName'), variables('westus2SubnetName'))]",
+        "westus2SubnetResourceId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('westus2VnetName'), variables('westus2SubnetName'))]"
     },
     "resources": [
         {
