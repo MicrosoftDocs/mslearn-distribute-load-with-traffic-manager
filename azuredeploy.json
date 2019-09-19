@@ -146,7 +146,9 @@
             "properties": {
                 "publicIPAddressVersion": "IPv4",
                 "publicIPAllocationMethod": "Static",
-                "domainNameLabel": "[variables('eastasiaVMDNSName')]"
+                "dnsSettings": {
+                    "domainNameLabel": "[variables('eastasiaVMDNSName')]"
+                }
             },
             "dependsOn": []
         },
@@ -162,7 +164,9 @@
             "properties": {
                 "publicIPAddressVersion": "IPv4",
                 "publicIPAllocationMethod": "Static",
-                "domainNameLabel": "[variables('westus2VMDNSName')]"
+                "dnsSettings":{
+                    "domainNameLabel": "[variables('westus2VMDNSName')]"
+                }
             },
             "dependsOn": []
         },
