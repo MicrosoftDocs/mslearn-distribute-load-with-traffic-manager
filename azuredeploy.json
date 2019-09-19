@@ -403,10 +403,5 @@
             ]
         }
     ],
-    "outputs": {
-        "webSiteUrl": {
-            "type":"string",
-            "value": "[concat('http://', reference(resourceId('Microsoft.Network/publicIPAddresses',variables('webVMNicPIPName'))).IpAddress)]"
-        }
-    }
+    "outputs": {}
 }
