@@ -22,6 +22,7 @@
         "eastasiaVMNicPIPName": "eastasia-vm-nic-pip",
         "eastasiaSubnetName": "eastasia-subnet",
         "eastasiaSubnetPrefix": "10.1.0.0/24",
+        "eastasiaVMDNSName": "[concat(variables('eastasiaVMName'), '-', uniqueString(resourceGroup().id))]",
         "eastasiaVMNicResourceId": "[resourceId('Microsoft.Network/networkInterfaces', variables('eastasiaVMNicName'))]",
         "eastasiaVMNicPIPResourceId": "[resourceId('Microsoft.Network/publicIPAddresses', variables('eastasiaVMNicPIPName'))]",
         "eastasiaSubnetResourceId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('eastasiaVnetName'), variables('eastasiaSubnetName'))]",
@@ -35,6 +36,7 @@
         "westus2VMNicPIPName": "westus2-vm-nic-pip",
         "westus2SubnetName": "westus2-subnet",
         "westus2SubnetPrefix": "10.2.0.0/24",
+        "westus2VMDNSName": "[concat(variables('westus2VMName'), '-', uniqueString(resourceGroup().id))]",
         "westus2VMNicResourceId": "[resourceId('Microsoft.Network/networkInterfaces', variables('westus2VMNicName'))]",
         "westus2VMNicPIPResourceId": "[resourceId('Microsoft.Network/publicIPAddresses', variables('westus2VMNicPIPName'))]",
         "westus2SubnetResourceId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('westus2VnetName'), variables('westus2SubnetName'))]"
@@ -144,7 +146,7 @@
             "properties": {
                 "publicIPAddressVersion": "IPv4",
                 "publicIPAllocationMethod": "Static",
-                "idleTimeoutInMinutes": 4
+                "domainNameLabel": "[variables('eastasiaVMDNSName')]"
             },
             "dependsOn": []
         },
@@ -160,7 +162,7 @@
             "properties": {
                 "publicIPAddressVersion": "IPv4",
                 "publicIPAllocationMethod": "Static",
-                "idleTimeoutInMinutes": 4
+                "domainNameLabel": "[variables('westus2VMDNSName')]"
             },
             "dependsOn": []
         },
