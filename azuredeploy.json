@@ -1,0 +1,413 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "username": {
+            "type": "string",
+            "defaultValue": "azureuser"
+        },
+        "password": {
+            "type": "securestring"
+        }
+    },
+    "variables": {
+        "deploymentUrl": "[deployment().properties.templateLink.uri]",
+        "eastasiaVnetName": "eastasia-vnet",
+        "eastasiaVnetAddressPrefix": "10.1.0.0/16",
+        "eastasiaVnetResourceId": "[resourceId('Microsoft.Network/virtualNetworks', variables('eastasiaVnetName'))]",
+        "eastasiaNSGName": "eastasia-nsg",
+        "eastasiaNSGResourceId": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('eastasiaNSGName'))]",
+        "eastasiaVMName": "eastasia-vm",
+        "eastasiaVMNicName": "eastasia-vm-nic",
+        "eastasiaVMNicPIPName": "eastasia-vm-nic-pip",
+        "eastasiaSubnetName": "eastasia-subnet",
+        "eastasiaSubnetPrefix": "10.1.0.0/24",
+        "eastasiaVMDNSName": "[concat(variables('eastasiaVMName'), '-', uniqueString(resourceGroup().id))]",
+        "eastasiaVMNicResourceId": "[resourceId('Microsoft.Network/networkInterfaces', variables('eastasiaVMNicName'))]",
+        "eastasiaVMNicPIPResourceId": "[resourceId('Microsoft.Network/publicIPAddresses', variables('eastasiaVMNicPIPName'))]",
+        "eastasiaSubnetResourceId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('eastasiaVnetName'), variables('eastasiaSubnetName'))]",
+        "westus2VnetName": "westus2-vnet",
+        "westus2VnetAddressPrefix": "10.2.0.0/16",
+        "westus2VnetResourceId": "[resourceId('Microsoft.Network/virtualNetworks', variables('westus2VnetName'))]",
+        "westus2NSGName": "westus2-nsg",
+        "westus2NSGResourceId": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('westus2NSGName'))]",
+        "westus2VMName": "westus2-vm",
+        "westus2VMNicName": "westus2-vm-nic",
+        "westus2VMNicPIPName": "westus2-vm-nic-pip",
+        "westus2SubnetName": "westus2-subnet",
+        "westus2SubnetPrefix": "10.2.0.0/24",
+        "westus2VMDNSName": "[concat(variables('westus2VMName'), '-', uniqueString(resourceGroup().id))]",
+        "westus2VMNicResourceId": "[resourceId('Microsoft.Network/networkInterfaces', variables('westus2VMNicName'))]",
+        "westus2VMNicPIPResourceId": "[resourceId('Microsoft.Network/publicIPAddresses', variables('westus2VMNicPIPName'))]",
+        "westus2SubnetResourceId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('westus2VnetName'), variables('westus2SubnetName'))]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "name": "[variables('eastasiaNSGName')]",
+            "apiVersion": "2018-08-01",
+            "location": "eastasia",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "http",
+                        "properties": {
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "80",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 300,
+                            "direction": "Inbound"
+                        }
+                    }
+                ]
+            },
+            "dependsOn": []
+        },
+        {
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "name": "[variables('westus2NSGName')]",
+            "apiVersion": "2018-08-01",
+            "location": "westus2",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "http",
+                        "properties": {
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "80",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 300,
+                            "direction": "Inbound"
+                        }
+                    }
+                ]
+            },
+            "dependsOn": []
+        },
+        {
+            "type": "Microsoft.Network/virtualNetworks",
+            "name": "[variables('eastasiaVnetName')]",
+            "apiVersion": "2018-08-01",
+            "location": "eastasia",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[variables('eastasiaVnetAddressPrefix')]"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[variables('eastasiaSubnetName')]",
+                        "properties": {
+                            "addressPrefix": "[variables('eastasiaSubnetPrefix')]"
+                        }
+                    }
+                ]
+            },
+            "dependsOn": []
+        },
+        {
+            "type": "Microsoft.Network/virtualNetworks",
+            "name": "[variables('westus2VnetName')]",
+            "apiVersion": "2018-08-01",
+            "location": "westus2",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[variables('westus2VnetAddressPrefix')]"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[variables('westus2SubnetName')]",
+                        "properties": {
+                            "addressPrefix": "[variables('westus2SubnetPrefix')]"
+                        }
+                    }
+                ]
+            },
+            "dependsOn": []
+        },
+        {
+            "type": "Microsoft.Network/publicIPAddresses",
+            "sku": {
+                "name": "Basic",
+                "tier": "Regional"
+            },
+            "name": "[variables('eastasiaVMNicPIPName')]",
+            "apiVersion": "2018-08-01",
+            "location": "eastasia",
+            "properties": {
+                "publicIPAddressVersion": "IPv4",
+                "publicIPAllocationMethod": "Static",
+                "dnsSettings": {
+                    "domainNameLabel": "[variables('eastasiaVMDNSName')]"
+                }
+            },
+            "dependsOn": []
+        },
+        {
+            "type": "Microsoft.Network/publicIPAddresses",
+            "sku": {
+                "name": "Basic",
+                "tier": "Regional"
+            },
+            "name": "[variables('westus2VMNicPIPName')]",
+            "apiVersion": "2018-08-01",
+            "location": "westus2",
+            "properties": {
+                "publicIPAddressVersion": "IPv4",
+                "publicIPAllocationMethod": "Static",
+                "dnsSettings":{
+                    "domainNameLabel": "[variables('westus2VMDNSName')]"
+                }
+            },
+            "dependsOn": []
+        },
+        {
+            "type": "Microsoft.Network/networkInterfaces",
+            "name": "[variables('eastasiaVMNicName')]",
+            "apiVersion": "2018-08-01",
+            "location": "eastasia",
+            "scale": null,
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAddress": "10.1.0.4",
+                            "privateIPAllocationMethod": "Static",
+                            "publicIPAddress": {
+                                "id": "[variables('eastasiaVMNicPIPResourceId')]"
+                            },
+                            "subnet": {
+                                "id": "[variables('eastasiaSubnetResourceId')]"
+                            },
+                            "primary": true,
+                            "privateIPAddressVersion": "IPv4"
+                        }
+                    }
+                ],
+                "enableAcceleratedNetworking": false,
+                "enableIPForwarding": false,
+                "primary": true,
+                "networkSecurityGroup": {
+                    "id": "[variables('eastasiaNSGResourceId')]"
+                }
+            },
+            "dependsOn": [
+                "[variables('eastasiaVMNicPIPName')]",
+                "[variables('eastasiaVnetResourceId')]",
+                "[variables('eastasiaNSGResourceId')]"
+            ]
+        },
+        {
+            "type": "Microsoft.Network/networkInterfaces",
+            "name": "[variables('westus2VMNicName')]",
+            "apiVersion": "2018-08-01",
+            "location": "westus2",
+            "scale": null,
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAddress": "10.2.0.4",
+                            "privateIPAllocationMethod": "Static",
+                            "publicIPAddress": {
+                                "id": "[variables('westus2VMNicPIPResourceId')]"
+                            },
+                            "subnet": {
+                                "id": "[variables('westus2SubnetResourceId')]"
+                            },
+                            "primary": true,
+                            "privateIPAddressVersion": "IPv4"
+                        }
+                    }
+                ],
+                "enableAcceleratedNetworking": false,
+                "enableIPForwarding": false,
+                "primary": true,
+                "networkSecurityGroup": {
+                    "id": "[variables('westus2NSGResourceId')]"
+                }
+            },
+            "dependsOn": [
+                "[variables('westus2VMNicPIPName')]",
+                "[variables('westus2VnetResourceId')]",
+                "[variables('westus2NSGResourceId')]"
+            ]
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines",
+            "name": "[variables('eastasiaVMName')]",
+            "apiVersion": "2018-06-01",
+            "location": "eastasia",
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "Standard_DS1_v2"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "Canonical",
+                        "offer": "UbuntuServer",
+                        "sku": "18.04-LTS",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "osType": "Linux",
+                        "name": "[concat(variables('eastasiaVMName'), '-disk')]",
+                        "createOption": "FromImage",
+                        "caching": "ReadWrite",
+                        "managedDisk": {
+                            "storageAccountType": "Premium_LRS"
+                        },
+                        "diskSizeGB": 30
+                    },
+                    "dataDisks": []
+                },
+                "osProfile": {
+                    "computerName": "[variables('eastasiaVMName')]",
+                    "adminUsername": "[parameters('username')]",
+                    "adminPassword": "[parameters('password')]",
+                    "linuxConfiguration": {
+                        "disablePasswordAuthentication": false,
+                        "provisionVMAgent": true
+                    },
+                    "secrets": [],
+                    "allowExtensionOperations": true
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[variables('eastasiaVMNicResourceId')]"
+                        }
+                    ]
+                },
+                "diagnosticsProfile": {
+                    "bootDiagnostics": {
+                        "enabled": false
+                    }
+                }
+            },
+            "resources": [
+                {
+                    "type": "extensions",
+                    "name": "apache-ext",
+                    "apiVersion": "2018-10-01",
+                    "location": "eastasia",
+                    "properties": {
+                        "publisher": "Microsoft.Azure.Extensions",
+                        "type": "CustomScript",
+                        "typeHandlerVersion": "2.0",
+                        "autoUpgradeMinorVersion": true,
+                        "settings": {
+                            "skipDos2Unix": true
+                        },
+                        "protectedSettings": {
+                            "commandToExecute": "sh setup-nginx.sh eastasia",
+                            "fileUris": [
+                                "[uri(variables('deploymentUrl'), 'setup-nginx.sh')]"
+                            ]
+                        }
+                    },
+                    "dependsOn": [
+                        "[variables('eastasiaVMName')]"
+                    ]
+                }
+            ],
+            "dependsOn": [
+                "[variables('eastasiaVMNicName')]"
+            ]
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines",
+            "name": "[variables('westus2VMName')]",
+            "apiVersion": "2018-06-01",
+            "location": "westus2",
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "Standard_DS1_v2"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "Canonical",
+                        "offer": "UbuntuServer",
+                        "sku": "18.04-LTS",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "osType": "Linux",
+                        "name": "[concat(variables('westus2VMName'), '-disk')]",
+                        "createOption": "FromImage",
+                        "caching": "ReadWrite",
+                        "managedDisk": {
+                            "storageAccountType": "Premium_LRS"
+                        },
+                        "diskSizeGB": 30
+                    },
+                    "dataDisks": []
+                },
+                "osProfile": {
+                    "computerName": "[variables('westus2VMName')]",
+                    "adminUsername": "[parameters('username')]",
+                    "adminPassword": "[parameters('password')]",
+                    "linuxConfiguration": {
+                        "disablePasswordAuthentication": false,
+                        "provisionVMAgent": true
+                    },
+                    "secrets": [],
+                    "allowExtensionOperations": true
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[variables('westus2VMNicResourceId')]"
+                        }
+                    ]
+                },
+                "diagnosticsProfile": {
+                    "bootDiagnostics": {
+                        "enabled": false
+                    }
+                }
+            },
+            "resources": [
+                {
+                    "type": "extensions",
+                    "name": "apache-ext",
+                    "apiVersion": "2018-10-01",
+                    "location": "westus2",
+                    "properties": {
+                        "publisher": "Microsoft.Azure.Extensions",
+                        "type": "CustomScript",
+                        "typeHandlerVersion": "2.0",
+                        "autoUpgradeMinorVersion": true,
+                        "settings": {
+                            "skipDos2Unix": true
+                        },
+                        "protectedSettings": {
+                            "commandToExecute": "sh setup-nginx.sh westus2",
+                            "fileUris": [
+                                "[uri(variables('deploymentUrl'), 'setup-nginx.sh')]"
+                            ]
+                        }
+                    },
+                    "dependsOn": [
+                        "[variables('westus2VMName')]"
+                    ]
+                }
+            ],
+            "dependsOn": [
+                "[variables('westus2VMNicName')]"
+            ]
+        }
+    ],
+    "outputs": {}
+}
