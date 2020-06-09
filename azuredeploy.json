@@ -11,7 +11,7 @@
         }
     },
     "variables": {
-        "deploymentUrl": "https://raw.githubusercontent.com/MicrosoftDocs/mslearn-distribute-load-with-traffic-manager/master/",
+        "deploymentUrl": "[deployment().properties.templateLink.uri]",
         "eastasiaVnetName": "eastasia-vnet",
         "eastasiaVnetAddressPrefix": "10.1.0.0/16",
         "eastasiaVnetResourceId": "[resourceId('Microsoft.Network/virtualNetworks', variables('eastasiaVnetName'))]",
