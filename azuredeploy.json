@@ -12,20 +12,20 @@
     },
     "variables": {
         "deploymentUrl": "[deployment().properties.templateLink.uri]",
-        "eastasiaVnetName": "eastasia-vnet",
-        "eastasiaVnetAddressPrefix": "10.1.0.0/16",
-        "eastasiaVnetResourceId": "[resourceId('Microsoft.Network/virtualNetworks', variables('eastasiaVnetName'))]",
-        "eastasiaNSGName": "eastasia-nsg",
-        "eastasiaNSGResourceId": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('eastasiaNSGName'))]",
-        "eastasiaVMName": "eastasia-vm",
-        "eastasiaVMNicName": "eastasia-vm-nic",
-        "eastasiaVMNicPIPName": "eastasia-vm-nic-pip",
-        "eastasiaSubnetName": "eastasia-subnet",
-        "eastasiaSubnetPrefix": "10.1.0.0/24",
-        "eastasiaVMDNSName": "[concat(variables('eastasiaVMName'), '-', uniqueString(resourceGroup().id))]",
-        "eastasiaVMNicResourceId": "[resourceId('Microsoft.Network/networkInterfaces', variables('eastasiaVMNicName'))]",
-        "eastasiaVMNicPIPResourceId": "[resourceId('Microsoft.Network/publicIPAddresses', variables('eastasiaVMNicPIPName'))]",
-        "eastasiaSubnetResourceId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('eastasiaVnetName'), variables('eastasiaSubnetName'))]",
+        "westeuropeVnetName": "westeurope-vnet",
+        "westeuropeVnetAddressPrefix": "10.1.0.0/16",
+        "westeuropeVnetResourceId": "[resourceId('Microsoft.Network/virtualNetworks', variables('westeuropeVnetName'))]",
+        "westeuropeNSGName": "westeurope-nsg",
+        "westeuropeNSGResourceId": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('westeuropeNSGName'))]",
+        "westeuropeVMName": "westeurope-vm",
+        "westeuropeVMNicName": "westeurope-vm-nic",
+        "westeuropeVMNicPIPName": "westeurope-vm-nic-pip",
+        "westeuropeSubnetName": "westeurope-subnet",
+        "westeuropeSubnetPrefix": "10.1.0.0/24",
+        "westeuropeVMDNSName": "[concat(variables('westeuropeVMName'), '-', uniqueString(resourceGroup().id))]",
+        "westeuropeVMNicResourceId": "[resourceId('Microsoft.Network/networkInterfaces', variables('westeuropeVMNicName'))]",
+        "westeuropeVMNicPIPResourceId": "[resourceId('Microsoft.Network/publicIPAddresses', variables('westeuropeVMNicPIPName'))]",
+        "westeuropeSubnetResourceId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('westeuropeVnetName'), variables('westeuropeSubnetName'))]",
         "westus2VnetName": "westus2-vnet",
         "westus2VnetAddressPrefix": "10.2.0.0/16",
         "westus2VnetResourceId": "[resourceId('Microsoft.Network/virtualNetworks', variables('westus2VnetName'))]",
@@ -44,9 +44,9 @@
     "resources": [
         {
             "type": "Microsoft.Network/networkSecurityGroups",
-            "name": "[variables('eastasiaNSGName')]",
+            "name": "[variables('westeuropeNSGName')]",
             "apiVersion": "2018-08-01",
-            "location": "eastasia",
+            "location": "westeurope",
             "properties": {
                 "securityRules": [
                     {
@@ -92,20 +92,20 @@
         },
         {
             "type": "Microsoft.Network/virtualNetworks",
-            "name": "[variables('eastasiaVnetName')]",
+            "name": "[variables('westeuropeVnetName')]",
             "apiVersion": "2018-08-01",
-            "location": "eastasia",
+            "location": "westeurope",
             "properties": {
                 "addressSpace": {
                     "addressPrefixes": [
-                        "[variables('eastasiaVnetAddressPrefix')]"
+                        "[variables('westeuropeVnetAddressPrefix')]"
                     ]
                 },
                 "subnets": [
                     {
-                        "name": "[variables('eastasiaSubnetName')]",
+                        "name": "[variables('westeuropeSubnetName')]",
                         "properties": {
-                            "addressPrefix": "[variables('eastasiaSubnetPrefix')]"
+                            "addressPrefix": "[variables('westeuropeSubnetPrefix')]"
                         }
                     }
                 ]
@@ -140,14 +140,14 @@
                 "name": "Basic",
                 "tier": "Regional"
             },
-            "name": "[variables('eastasiaVMNicPIPName')]",
+            "name": "[variables('westeuropeVMNicPIPName')]",
             "apiVersion": "2018-08-01",
-            "location": "eastasia",
+            "location": "westeurope",
             "properties": {
                 "publicIPAddressVersion": "IPv4",
                 "publicIPAllocationMethod": "Static",
                 "dnsSettings": {
-                    "domainNameLabel": "[variables('eastasiaVMDNSName')]"
+                    "domainNameLabel": "[variables('westeuropeVMDNSName')]"
                 }
             },
             "dependsOn": []
@@ -172,9 +172,9 @@
         },
         {
             "type": "Microsoft.Network/networkInterfaces",
-            "name": "[variables('eastasiaVMNicName')]",
+            "name": "[variables('westeuropeVMNicName')]",
             "apiVersion": "2018-08-01",
-            "location": "eastasia",
+            "location": "westeurope",
             "scale": null,
             "properties": {
                 "ipConfigurations": [
@@ -184,10 +184,10 @@
                             "privateIPAddress": "10.1.0.4",
                             "privateIPAllocationMethod": "Static",
                             "publicIPAddress": {
-                                "id": "[variables('eastasiaVMNicPIPResourceId')]"
+                                "id": "[variables('westeuropeVMNicPIPResourceId')]"
                             },
                             "subnet": {
-                                "id": "[variables('eastasiaSubnetResourceId')]"
+                                "id": "[variables('westeuropeSubnetResourceId')]"
                             },
                             "primary": true,
                             "privateIPAddressVersion": "IPv4"
@@ -198,13 +198,13 @@
                 "enableIPForwarding": false,
                 "primary": true,
                 "networkSecurityGroup": {
-                    "id": "[variables('eastasiaNSGResourceId')]"
+                    "id": "[variables('westeuropeNSGResourceId')]"
                 }
             },
             "dependsOn": [
-                "[variables('eastasiaVMNicPIPName')]",
-                "[variables('eastasiaVnetResourceId')]",
-                "[variables('eastasiaNSGResourceId')]"
+                "[variables('westeuropeVMNicPIPName')]",
+                "[variables('westeuropeVnetResourceId')]",
+                "[variables('westeuropeNSGResourceId')]"
             ]
         },
         {
@@ -246,9 +246,9 @@
         },
         {
             "type": "Microsoft.Compute/virtualMachines",
-            "name": "[variables('eastasiaVMName')]",
+            "name": "[variables('westeuropeVMName')]",
             "apiVersion": "2018-06-01",
-            "location": "eastasia",
+            "location": "westeurope",
             "properties": {
                 "hardwareProfile": {
                     "vmSize": "Standard_DS1_v2"
@@ -262,7 +262,7 @@
                     },
                     "osDisk": {
                         "osType": "Linux",
-                        "name": "[concat(variables('eastasiaVMName'), '-disk')]",
+                        "name": "[concat(variables('westeuropeVMName'), '-disk')]",
                         "createOption": "FromImage",
                         "caching": "ReadWrite",
                         "managedDisk": {
@@ -273,7 +273,7 @@
                     "dataDisks": []
                 },
                 "osProfile": {
-                    "computerName": "[variables('eastasiaVMName')]",
+                    "computerName": "[variables('westeuropeVMName')]",
                     "adminUsername": "[parameters('username')]",
                     "adminPassword": "[parameters('password')]",
                     "linuxConfiguration": {
@@ -286,7 +286,7 @@
                 "networkProfile": {
                     "networkInterfaces": [
                         {
-                            "id": "[variables('eastasiaVMNicResourceId')]"
+                            "id": "[variables('westeuropeVMNicResourceId')]"
                         }
                     ]
                 },
@@ -301,7 +301,7 @@
                     "type": "extensions",
                     "name": "apache-ext",
                     "apiVersion": "2018-10-01",
-                    "location": "eastasia",
+                    "location": "westeurope",
                     "properties": {
                         "publisher": "Microsoft.Azure.Extensions",
                         "type": "CustomScript",
@@ -311,19 +311,19 @@
                             "skipDos2Unix": true
                         },
                         "protectedSettings": {
-                            "commandToExecute": "sh setup-nginx.sh eastasia",
+                            "commandToExecute": "sh setup-nginx.sh westeurope",
                             "fileUris": [
                                 "[uri(variables('deploymentUrl'), 'setup-nginx.sh')]"
                             ]
                         }
                     },
                     "dependsOn": [
-                        "[variables('eastasiaVMName')]"
+                        "[variables('westeuropeVMName')]"
                     ]
                 }
             ],
             "dependsOn": [
-                "[variables('eastasiaVMNicName')]"
+                "[variables('westeuropeVMNicName')]"
             ]
         },
         {
